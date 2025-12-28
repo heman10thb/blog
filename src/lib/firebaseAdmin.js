@@ -17,18 +17,25 @@ function initializeFirebaseAdmin() {
 
     // Option 1: Load from service account file (most reliable)
     const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-    if (serviceAccountPath && fs.existsSync(serviceAccountPath)) {
-        try {
-            console.log('[Firebase Admin] Loading from file:', serviceAccountPath);
-            const credentials = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-            const app = initializeApp({
-                credential: cert(credentials),
-                projectId: credentials.project_id,
-            });
-            console.log('[Firebase Admin] ✓ Successfully initialized from file');
-            return app;
-        } catch (error) {
-            console.error('[Firebase Admin] ✗ Error loading from file:', error.message);
+    console.log('[Firebase Admin] GOOGLE_APPLICATION_CREDENTIALS:', serviceAccountPath || '✗ Not set');
+
+    if (serviceAccountPath) {
+        const fileExists = fs.existsSync(serviceAccountPath);
+        console.log('[Firebase Admin] File exists:', fileExists ? '✓ Yes' : '✗ No');
+
+        if (fileExists) {
+            try {
+                console.log('[Firebase Admin] Loading from file:', serviceAccountPath);
+                const credentials = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+                const app = initializeApp({
+                    credential: cert(credentials),
+                    projectId: credentials.project_id,
+                });
+                console.log('[Firebase Admin] ✓ Successfully initialized from file');
+                return app;
+            } catch (error) {
+                console.error('[Firebase Admin] ✗ Error loading from file:', error.message);
+            }
         }
     }
 
