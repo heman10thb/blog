@@ -17,7 +17,19 @@ function initializeFirebaseAdmin() {
     // Use individual environment variables (recommended for hosting platforms)
     const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+    // Support both regular and base64-encoded private key
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    const privateKeyBase64 = process.env.FIREBASE_PRIVATE_KEY_BASE64;
+
+    if (privateKeyBase64) {
+        // Decode base64-encoded private key
+        privateKey = Buffer.from(privateKeyBase64, 'base64').toString('utf-8');
+        console.log('[Firebase Admin] Using base64-decoded private key');
+    } else if (privateKey) {
+        // Replace escaped newlines with actual newlines
+        privateKey = privateKey.replace(/\\n/g, '\n');
+    }
 
     console.log('[Firebase Admin] Checking individual env vars:');
     console.log('  - FIREBASE_PROJECT_ID:', projectId ? '✓ Set' : '✗ Missing');
