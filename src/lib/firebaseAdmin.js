@@ -43,14 +43,20 @@ function initializeFirebaseAdmin() {
     const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
-    // Support both regular and base64-encoded private key
+    // Support multiple ways to provide the private key
     let privateKey = process.env.FIREBASE_PRIVATE_KEY;
     const privateKeyBase64 = process.env.FIREBASE_PRIVATE_KEY_BASE64;
+    const privateKeyPart1 = process.env.FIREBASE_PRIVATE_KEY_1;
+    const privateKeyPart2 = process.env.FIREBASE_PRIVATE_KEY_2;
 
     if (privateKeyBase64) {
         // Decode base64-encoded private key
         privateKey = Buffer.from(privateKeyBase64, 'base64').toString('utf-8');
         console.log('[Firebase Admin] Using base64-decoded private key');
+    } else if (privateKeyPart1 && privateKeyPart2) {
+        // Concatenate split private key parts
+        privateKey = (privateKeyPart1 + privateKeyPart2).replace(/\\n/g, '\n');
+        console.log('[Firebase Admin] Using split private key (part1 + part2)');
     } else if (privateKey) {
         // Replace escaped newlines with actual newlines
         privateKey = privateKey.replace(/\\n/g, '\n');
