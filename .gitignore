@@ -30,11 +30,17 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
+# env files
+.env.local
+env.local
 .vercel
+
+# deploy folder (local build output)
+/deploy/
+
+# archive
+Archive/
+Archive.zip
 
 # typescript
 *.tsbuildinfo
