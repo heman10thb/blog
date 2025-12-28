@@ -1,5 +1,6 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import fs from 'fs';
 
 // Initialize Firebase Admin SDK
 // This bypasses security rules and has full access to Firestore
@@ -14,7 +15,24 @@ function initializeFirebaseAdmin() {
         return apps[0];
     }
 
-    // Use individual environment variables (recommended for hosting platforms)
+    // Option 1: Load from service account file (most reliable)
+    const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    if (serviceAccountPath && fs.existsSync(serviceAccountPath)) {
+        try {
+            console.log('[Firebase Admin] Loading from file:', serviceAccountPath);
+            const credentials = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+            const app = initializeApp({
+                credential: cert(credentials),
+                projectId: credentials.project_id,
+            });
+            console.log('[Firebase Admin] ✓ Successfully initialized from file');
+            return app;
+        } catch (error) {
+            console.error('[Firebase Admin] ✗ Error loading from file:', error.message);
+        }
+    }
+
+    // Option 2: Use individual environment variables (recommended for hosting platforms)
     const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
